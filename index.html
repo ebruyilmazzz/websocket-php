@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket</title>
+</head>
+<body>
+    <h1>WebSocket</h1>
+    <div id="messages"></div>
+    <input type="text" id="inputMessage" placeholder="Mesaj yaz..." />
+    <button id="sendBtn">Gönder</button>
+
+<script>
+// WebSocket bağlantısı
+const socket = new WebSocket('ws://localhost:8082/chat');  // 'ws://' eklenmeli
+
+socket.onopen = () => {
+    // Bağlantı açıldığında ekrana "Bağlantı açıldı" yazdırılır
+    console.log('Bağlantı açıldı');
+};
+
+socket.onmessage = (event) => {
+    // WebSocket üzerinden mesaj alındığında çalışacak fonksiyon
+    const messageDiv = document.getElementById('messages');  // messages ID'sine sahip div elemanını alır
+    const newMessage = document.createElement('p');  // Yeni bir paragraf öğesi oluşturur
+    newMessage.textContent = event.data;  // Gelen mesajı yeni paragraf öğesinin metni olarak ayarlar
+    messageDiv.appendChild(newMessage);  // Yeni mesajları messages div'ine ekler
+    messageDiv.scrollTop = messageDiv.scrollHeight;  // Mesajlar div'inin sonuna kaydırmak için kullanılır
+};
+
+socket.onerror = (error) => {
+    // Hata oluştuğunda çalışacak fonksiyon
+    console.log('WebSocket hatası:', error);
+};
+
+socket.onclose = () => {
+    // Bağlantı kapandığında çalışacak fonksiyon
+    console.log('WebSocket bağlantısı kapandı');
+};
+
+document.getElementById('sendBtn').onclick = () => {
+    // Gönder butonuna tıklandığında bu fonksiyon çalışır
+    const message = document.getElementById('inputMessage').value;  // Kullanıcının girdiği mesajı alır
+    if (message) {  // Eğer mesaj boş değilse mesaj gönderilme ihtimali
+        socket.send(message);  // WebSocket üzerinden sunucuya gönderir
+        document.getElementById('inputMessage').value = '';  // Mesaj kutusunu temizler
+    }
+};
+</script>
+</body>
+</html>
